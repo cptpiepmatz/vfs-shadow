@@ -1,0 +1,21 @@
+[package]
+name = "vfs-shadow"
+version = "0.1.0+0.12"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[[example]]
+name = "example"
+path = "./example/example.rs"
+
+[dependencies]
+proc-macro2 = "1"
+proc-macro-error2 = "2"
+quote = "1"
+syn = "2"
+walkdir = "2"
+
+[dev-dependencies]
+vfs = "0.12"

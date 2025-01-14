@@ -1,0 +1,6 @@
+[settings]
+version = "1.0.0"
+debug = true
+
+[paths]
+log_dir = "/var/log"
