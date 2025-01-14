@@ -3,6 +3,9 @@ name = "vfs-shadow"
 version = "0.1.0+0.12"
 edition = "2021"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [lib]
 proc-macro = true
 
@@ -16,6 +19,7 @@ proc-macro-error2 = "2"
 quote = "1"
 syn = "2"
 walkdir = "2"
+vfs = { version = "0.12", optional = true }
 
 [dev-dependencies]
 vfs = "0.12"

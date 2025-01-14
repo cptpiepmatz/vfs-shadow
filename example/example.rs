@@ -4,6 +4,9 @@ use vfs::{FileSystem, MemoryFS};
 use vfs_shadow::load_into_vfs;
 
 pub fn main() {
+    let fs = MemoryFS::new();
+    load_into_vfs!("example/vfs", &fs).unwrap();
+
     let fs = load_into_vfs!("example/vfs", MemoryFS::new()).unwrap();
     assert_eq!(
         read_all(fs.open_file("/config.toml").unwrap()),
