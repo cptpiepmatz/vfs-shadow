@@ -73,7 +73,7 @@ mod tests {
 
     #[test]
     fn dir_entries_works() {
-        let dir_entries = dir_entries("example/vfs", Span2::call_site()).unwrap();
+        let dir_entries = dir_entries("example/vfs", Span2::call_site());
 
         // map the directory entries into a HashSet of tuples for easy comparison
         let actual: Vec<(String, String, bool)> = dir_entries

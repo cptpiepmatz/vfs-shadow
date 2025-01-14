@@ -1,51 +1,47 @@
 //! # vfs-shadow
-//! 
-//! This crate allows embedding files from a directory into a virtual filesystem (VFS) during 
-//! compile time. 
-//! The macro [`load_into_vfs!`] takes a path to a directory and a [filesystem](vfs::FileSystem), 
+//!
+//! This crate allows embedding files from a directory into a virtual filesystem (VFS) during
+//! compile time.
+//! The macro [`load_into_vfs!`] takes a path to a directory and a [filesystem](vfs::FileSystem),
 //! then loads the contents of the directory into the provided filesystem.
-//! 
+//!
 //! ## Usage
-//! Use the [`load_into_vfs!`] macro to load files from a directory into a 
-//! [MemoryFS](vfs::impls::memory::MemoryFS) (or any other filesystem that implements 
+//! Use the [`load_into_vfs!`] macro to load files from a directory into a
+//! [`MemoryFS`](vfs::impls::memory::MemoryFS) (or any other filesystem that implements
 //! [`vfs::FileSystem`]):
 //! ```
 //! use vfs_shadow::load_into_vfs;
 //! use vfs::{MemoryFS, FileSystem};
-//! 
-//! fn main() {
-//!     // Load files into a MemoryFS
-//!     let fs = load_into_vfs!("example/vfs", MemoryFS::new()).unwrap();
-//! 
-//!     // Interact with the embedded files
-//!     assert!(fs.exists("/data.json").is_ok());
-//! }
+//!
+//! // Load files into a MemoryFS
+//! let fs = load_into_vfs!("example/vfs", MemoryFS::new()).unwrap();
+//!
+//! // Interact with the embedded files
+//! assert!(fs.exists("/data.json").is_ok());
 //! ```
-//! 
+//!
 //! You can also pass a reference to an existing filesystem:
 //! ```
 //! use vfs_shadow::load_into_vfs;
 //! use vfs::{MemoryFS, FileSystem};
-//! 
-//! fn main() {
-//!     let fs = MemoryFS::new();
-//!     load_into_vfs!("example/vfs", &fs).unwrap();
-//! 
-//!     // Use the filesystem
-//!     assert!(fs.exists("/data.json").is_ok());
-//! }
+//!
+//! let fs = MemoryFS::new();
+//! load_into_vfs!("example/vfs", &fs).unwrap();
+//!
+//! // Use the filesystem
+//! assert!(fs.exists("/data.json").is_ok());
 //! ```
-//! 
-//! In both cases, the directory at `example/vfs` is included in the final binary, and its contents 
+//!
+//! In both cases, the directory at `example/vfs` is included in the final binary, and its contents
 //! are copied into the provided filesystem.
-//! 
+//!
 //! ### Path Resolution
-//! The path provided to `load_into_vfs!` is relative to the manifest directory. 
+//! The path provided to `load_into_vfs!` is relative to the manifest directory.
 //! This can change when [`proc_macro::Span::source_file`] stabilizes in future.
-//! 
+//!
 //! ## Return Value
-//! The macro returns a [`vfs::VfsResult<()>`]. 
-//! If an error occurs while copying files into the filesystem, the operation will fail, and 
+//! The macro returns a [`vfs::VfsResult<()>`].
+//! If an error occurs while copying files into the filesystem, the operation will fail, and
 //! execution will stop.
 
 use proc_macro::TokenStream;
@@ -61,39 +57,39 @@ use syn::{
 mod files;
 
 /// Embeds files from a directory into a virtual filesystem at compile time.
-/// 
-/// For general usage of the `load_into_vfs!` macro, please refer to the 
+///
+/// For general usage of the `load_into_vfs!` macro, please refer to the
 /// [crate-level documentation](crate).
-/// 
+///
 /// ## Pseudo Signature
 /// ```rust,ignore
 /// load_into_vfs!<FS: vfs::FileSystem>(path: &str, fs: &FS) -> vfs::VfsResult<FS>
 /// ```
-/// 
+///
 /// ## Implementation Details
-/// The `load_into_vfs!` macro is designed to load the contents of a directory into a virtual 
-/// filesystem at compile time. 
+/// The `load_into_vfs!` macro is designed to load the contents of a directory into a virtual
+/// filesystem at compile time.
 /// Here’s how it works:
-/// 
-/// 1. **Directory Walking**: 
-///     During compile time, the specified directory is recursively walked. 
-///     The macro collects the absolute paths of all entries within the directory, along with 
+///
+/// 1. **Directory Walking**:
+///     During compile time, the specified directory is recursively walked.
+///     The macro collects the absolute paths of all entries within the directory, along with
 ///     whether each entry is a file or a directory.
-/// 
+///
 /// 2. **Trait Generation**:
-///     The macro generates a private trait called `LoadIntoFileSystem`, which is implemented for 
-///     any type that implements the [`vfs::FileSystem`] trait. 
+///     The macro generates a private trait called `LoadIntoFileSystem`, which is implemented for
+///     any type that implements the [`vfs::FileSystem`] trait.
 ///     This trait includes a single function, `load_into_vfs`, which is generated at compile time.
-/// 
+///
 /// 3. **Directory Handling**:
-///     For directories, the generated code will create the corresponding directory in the VFS 
+///     For directories, the generated code will create the corresponding directory in the VFS
 ///     using:
 ///     ```rust,ignore
 ///     self.create_dir(#vfs_path)?;
 ///     ```
-/// 
+///
 /// 4. **File Handling**:
-///     For files, the macro generates a block of code to include the file contents as bytes and 
+///     For files, the macro generates a block of code to include the file contents as bytes and
 ///     write them into the VFS:
 ///     ```rust,ignore
 ///     {
@@ -103,9 +99,9 @@ mod files;
 ///     }
 ///     ```
 ///     This ensures the file's bytes are included in the binary and written to the VFS at runtime.
-/// 
+///
 /// 5. **Returning the Filesystem**:
-///     After processing all entries, the macro returns the filesystem wrapped in a 
+///     After processing all entries, the macro returns the filesystem wrapped in a
 ///     [`vfs::VfsResult`], allowing further interactions with the virtual filesystem.
 #[proc_macro]
 #[proc_macro_error]
