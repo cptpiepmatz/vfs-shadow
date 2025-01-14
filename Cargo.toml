@@ -2,6 +2,13 @@
 name = "vfs-shadow"
 version = "0.1.0+0.12"
 edition = "2021"
+authors = ["Tim 'Piepmatz' Hesse"]
+exclude = [".github/"]
+repository = "https://github.com/cptpiepmatz/vfs-shadow"
+description = "Effortlessly embed a local directory into a vfs."
+license = "MIT"
+keywords = ["vfs", "virtual-file-system", "macro", "embed"]
+categories = ["filesystem", "development-tools"]
 
 [package.metadata.docs.rs]
 all-features = true
