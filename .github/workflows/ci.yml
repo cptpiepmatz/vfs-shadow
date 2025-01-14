@@ -1,0 +1,37 @@
+name: continuous-integration
+
+on:
+  push:
+  pull_request:
+    
+env:
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  cargo:
+    name: cargo ${{ matrix.job.name }}
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        job:
+          - name: check
+            command: cargo check --workspace --examples
+          - name: clippy
+            command: cargo clippy --workspace --examples
+          - name: build
+            command: cargo build --workspace --examples
+          - name: doc
+            command: cargo doc --workspace --examples
+          - name: test
+            command: cargo test --workspace --examples
+          - name: run example
+            command: cargo run --example example
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rustflags: $RUSTFLAGS
+      - run: ${{ matrix.job.command }}
