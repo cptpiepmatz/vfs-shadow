@@ -1,10 +1,10 @@
+use proc_macro2::Span as Span2;
+use proc_macro_error2::{abort, abort_call_site};
 use std::{
     fs::FileType,
     path::{Path, PathBuf},
 };
-use proc_macro_error2::{abort, abort_call_site};
 use walkdir::WalkDir;
-use proc_macro2::Span as Span2;
 
 pub struct DirEntry {
     pub vfs_path: PathBuf,
@@ -29,9 +29,10 @@ pub fn dir_entries(path: impl AsRef<Path>, span: Span2) -> Vec<DirEntry> {
 
     let Ok(walker) = WalkDir::new(&base_path)
         .into_iter()
-        .collect::<Result<Vec<_>, _>>() else {
-            abort!(span, "could not walk directory");
-        };
+        .collect::<Result<Vec<_>, _>>()
+    else {
+        abort!(span, "could not walk directory");
+    };
     let entries = walker
         .into_iter()
         .map(|entry| {
@@ -61,7 +62,7 @@ pub trait PathExt {
 
 impl PathExt for Path {
     fn unixify(&self) -> PathBuf {
-        self.display().to_string().replace(r"\", "/").into()
+        self.display().to_string().replace('\\', "/").into()
     }
 }
 

@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use proc_macro2::{TokenStream as TokenStream2, Span as Span2};
+use proc_macro2::{Span as Span2, TokenStream as TokenStream2};
 use proc_macro_error2::proc_macro_error;
 use quote::quote;
 use std::path::PathBuf;
@@ -59,7 +59,7 @@ fn load_into_vfs_tokens(dir_entries: &[files::DirEntry]) -> TokenStream2 {
         real_path,
         vfs_path,
         file_type,
-    } in dir_entries.iter()
+    } in dir_entries
     {
         let real_path = real_path.display().to_string();
         let vfs_path = vfs_path.display().to_string();
