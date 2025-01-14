@@ -10,9 +10,9 @@
 
 <div align="center">
 
-  [![crates.io Version](https://img.shields.io/crates/v/vfs-shadow?style=for-the-badge)](https://crates.io/crates/nu-jupyter-kernel)
+  [![crates.io Version](https://img.shields.io/crates/v/vfs-shadow?style=for-the-badge)](https://crates.io/crates/vfs-shadow)
   [![vfs Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fcptpiepmatz%2Fvfs-shadow%2Fmain%2FCargo.toml&query=dependencies%5B'vfs'%5D.version&prefix=v&style=for-the-badge&label=vfs%20Version)](https://crates.io/crates/vfs)
-  [![License](https://img.shields.io/github/license/cptpiepmatz/nu-jupyter-kernel?style=for-the-badge)](https://github.com/cptpiepmatz/nu-jupyter-kernel/blob/main/LICENSE)
+  [![License](https://img.shields.io/github/license/cptpiepmatz/nu-jupyter-kernel?style=for-the-badge)](https://github.com/cptpiepmatz/vfs-shadow/blob/main/LICENSE)
 
 </div>
 
