@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{TokenStream as TokenStream2, Span as Span2};
 use proc_macro_error2::proc_macro_error;
 use quote::quote;
 use std::path::PathBuf;
@@ -16,7 +16,7 @@ pub fn load_into_vfs(input: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(input as Args);
 
     let fs = &args.fs;
-    let dir_entries = files::dir_entries(&args.path).unwrap();
+    let dir_entries = files::dir_entries(&args.path.0, args.path.1);
     let load_into_vfs = load_into_vfs_tokens(&dir_entries);
 
     quote! {{
@@ -34,14 +34,14 @@ pub fn load_into_vfs(input: TokenStream) -> TokenStream {
 }
 
 struct Args {
-    path: PathBuf,
+    path: (PathBuf, Span2),
     fs: syn::Expr,
 }
 
 impl Parse for Args {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let path: syn::LitStr = input.parse()?;
-        let path = PathBuf::from(path.value());
+        let path = (PathBuf::from(path.value()), path.span());
         input.parse::<Token![,]>()?;
         let fs: syn::Expr = input.parse()?;
 

@@ -2,7 +2,9 @@ use std::{
     fs::FileType,
     path::{Path, PathBuf},
 };
+use proc_macro_error2::{abort, abort_call_site};
 use walkdir::WalkDir;
+use proc_macro2::Span as Span2;
 
 pub struct DirEntry {
     pub vfs_path: PathBuf,
@@ -10,16 +12,26 @@ pub struct DirEntry {
     pub file_type: FileType,
 }
 
-pub fn dir_entries(path: impl AsRef<Path>) -> Result<Vec<DirEntry>, walkdir::Error> {
-    let manifest_path = std::env::var("CARGO_MANIFEST_DIR").expect("set by Cargo");
-    let base_path = PathBuf::from(manifest_path)
-        .join(path)
-        .canonicalize()
-        .unwrap();
+pub fn dir_entries(path: impl AsRef<Path>, span: Span2) -> Vec<DirEntry> {
+    let Ok(manifest_path) = std::env::var("CARGO_MANIFEST_DIR") else {
+        abort_call_site!("environment variable CARGO_MANIFEST_DIR not defined");
+    };
+    let base_path = PathBuf::from(manifest_path).join(path);
+    let base_path = match base_path.canonicalize() {
+        Ok(base_path) => base_path,
+        Err(err) => {
+            abort!(
+                span, "{}", err;
+                note = "happened while canonicalizing {:?}", base_path
+            );
+        }
+    };
 
-    let walker = WalkDir::new(&base_path)
+    let Ok(walker) = WalkDir::new(&base_path)
         .into_iter()
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Result<Vec<_>, _>>() else {
+            abort!(span, "could not walk directory");
+        };
     let entries = walker
         .into_iter()
         .map(|entry| {
@@ -40,7 +52,7 @@ pub fn dir_entries(path: impl AsRef<Path>) -> Result<Vec<DirEntry>, walkdir::Err
         })
         .collect();
 
-    Ok(entries)
+    entries
 }
 
 pub trait PathExt {
@@ -60,7 +72,7 @@ mod tests {
 
     #[test]
     fn dir_entries_works() {
-        let dir_entries = dir_entries("example/vfs").unwrap();
+        let dir_entries = dir_entries("example/vfs", Span2::call_site()).unwrap();
 
         // map the directory entries into a HashSet of tuples for easy comparison
         let actual: Vec<(String, String, bool)> = dir_entries
