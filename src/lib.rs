@@ -8,7 +8,7 @@ use syn::{
     Token,
 };
 
-mod vfs;
+mod files;
 
 #[proc_macro]
 #[proc_macro_error]
@@ -16,7 +16,7 @@ pub fn load_into_vfs(input: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(input as Args);
 
     let fs = &args.fs;
-    let dir_entries = vfs::dir_entries(&args.path).unwrap();
+    let dir_entries = files::dir_entries(&args.path).unwrap();
     let load_into_vfs = load_into_vfs_tokens(&dir_entries);
 
     quote! {{
@@ -53,9 +53,9 @@ impl Parse for Args {
     }
 }
 
-fn load_into_vfs_tokens(dir_entries: &[vfs::DirEntry]) -> TokenStream2 {
+fn load_into_vfs_tokens(dir_entries: &[files::DirEntry]) -> TokenStream2 {
     let mut instructions: Vec<TokenStream2> = Vec::with_capacity(dir_entries.len());
-    for vfs::DirEntry {
+    for files::DirEntry {
         real_path,
         vfs_path,
         file_type,
