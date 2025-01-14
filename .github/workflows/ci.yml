@@ -23,9 +23,9 @@ jobs:
           - name: build
             command: cargo build --workspace --examples
           - name: doc
-            command: cargo doc --workspace --examples
+            command: cargo doc --workspace --examples --all-features
           - name: test
-            command: cargo test --workspace --examples
+            command: cargo test --workspace --examples --doc --all-features
           - name: run example
             command: cargo run --example example
     
